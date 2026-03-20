@@ -1,0 +1,45 @@
+"""NOTE! SETTINGS dict can be changed during programm running.
+Key "TARGET_DIR" will be added from path = os.path.abspath(args.path)
+"""
+
+import os
+import sys
+
+from core.ansi.colorize import colorize
+
+
+def __conf_read() -> dict[str, str | os.PathLike[str]]:
+    """Configs in file must be like pairs:
+    key1=value1
+    key2=value2
+    Config file must be [project root]/settings/config.conf
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    Default values in file is and must be:
+    PATH=.
+    PATH_TO_FILE_EXCLUDE_DIRS=./settings/excluded_dirs.conf
+    PATH_TO_FILE_EXCLUDE_FILES=./settings/excluded_files.conf
+    """
+    with open("./settings/config.conf", encoding="utf-8") as file:
+        settings: dict[str, str | os.PathLike[str]] = {}
+        for pair in file.readlines():
+            pair = pair.strip()
+            # continue empty and comment lines
+            if pair.startswith("#") or not pair:
+                continue
+            if "=" not in pair:
+                raise ValueError("Data in config file isn't valid!")
+            k, v = pair.split("=", 1)
+            settings[k] = v
+        msg = "Configuration loaded from ./settings/config.conf"
+        print(colorize(sign="!", code="32", text=msg))
+        return settings
+
+# It runs during importing this module, to prepare settings.
+try:
+    SETTINGS = __conf_read()
+    if not SETTINGS.keys():
+        raise RuntimeError("File config.conf is empty.")
+except Exception as e:
+    print(str(e))
+    print(__conf_read.__doc__)
+    sys.exit(1)
