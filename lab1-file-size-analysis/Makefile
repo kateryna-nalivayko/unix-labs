@@ -7,4 +7,4 @@ analyze:
 	uv run python dtr.py analyze
 
 clean:
-	uv run python -c "import shutil; shutil.rmtree('data', True); shutil.rmtree('plots', True)"
+	rm -rf data plots

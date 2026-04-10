@@ -2,11 +2,8 @@ import os
 import sys
 import argparse
 
-if os.name == "nt" and sys.stdout.isatty():
-    from core.ansi.fix import enable_ansi_colors
-    enable_ansi_colors()
-
 from core.settings.conf_reader import SETTINGS
+from core.ansi.fix import enable_ansi_colors
 
 
 def cmd_watch(args):
@@ -16,6 +13,9 @@ def cmd_watch(args):
     if not os.path.isdir(path):
         print(f"Error: not a directory: {path}", file=sys.stderr)
         sys.exit(1)
+
+    if os.name == "nt" and sys.stdout.isatty():
+        enable_ansi_colors()
 
     SETTINGS["TARGET_DIR"] = path
 
@@ -27,7 +27,7 @@ def cmd_collect(args):
     """Collect file sizes from filesystem."""
     from core.collector import collect
 
-    directory = args.path or SETTINGS.get("PATH", ".")
+    directory = args.path or SETTINGS.get("PATH", "/")
     data_dir = SETTINGS.get("DATA_DIR", "./data")
     output_path = os.path.join(data_dir, "result.txt")
 
@@ -53,7 +53,7 @@ def main():
 
     # collect
     collect_parser = subparsers.add_parser("collect", help="Collect file sizes from filesystem")
-    collect_parser.add_argument("path", nargs="?", default=None, help="Root directory to scan (default: current directory)")
+    collect_parser.add_argument("path", nargs="?", default=None, help="Root directory to scan (default: /)")
 
     # analyze
     subparsers.add_parser("analyze", help="Analyze collected file size data")
