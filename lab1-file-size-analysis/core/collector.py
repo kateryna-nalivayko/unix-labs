@@ -36,7 +36,7 @@ def collect(directory=None, output_path=None):
     Returns the number of files collected.
     """
     if directory is None:
-        directory = SETTINGS.get("PATH", "/")
+        directory = SETTINGS.get("PATH", ".")
     if output_path is None:
         output_path = os.path.join(SETTINGS.get("DATA_DIR", "./data"), "result.txt")
 

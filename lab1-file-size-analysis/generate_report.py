@@ -52,7 +52,7 @@ def generate_report(data_path="./data/result.txt", plots_dir="./plots", output_p
     doc.add_heading("1. Опис завдання", level=1)
     doc.add_paragraph(
         "Мета роботи — проаналізувати частотний розподіл розмірів файлів "
-        "у файловій системі UNIX (macOS). Необхідно зібрати дані про розміри "
+        "у файловій системі Windows. Необхідно зібрати дані про розміри "
         "всіх файлів у файловій системі, побудувати візуалізації розподілу "
         "(гістограма, CDF, boxplot) та сформулювати висновки про характер розподілу."
     )
@@ -61,7 +61,7 @@ def generate_report(data_path="./data/result.txt", plots_dir="./plots", output_p
     doc.add_heading("2. Підготовка даних", level=1)
     doc.add_paragraph(
         "Збір даних здійснюється рекурсивним обходом файлової системи починаючи "
-        "з кореневого каталогу / за допомогою функції os.scandir() мови Python. "
+        "з кореневого каталогу C:\\ за допомогою функції os.scandir() мови Python. "
         "Для кожного файлу зчитується його розмір через системний виклик stat(). "
         "Результати записуються у файл data/result.txt — один розмір (у байтах) на рядок."
     )
@@ -73,9 +73,10 @@ def generate_report(data_path="./data/result.txt", plots_dir="./plots", output_p
     ]:
         doc.add_paragraph(item, style="List Bullet")
 
-    doc.add_paragraph("Еквівалент одним рядком у shell:")
+    doc.add_paragraph("Еквівалент одним рядком у PowerShell:")
     p = doc.add_paragraph()
-    run = p.add_run("find / -type f -exec stat -f '%z' {} + 2>/dev/null > data/result.txt")
+    run = p.add_run('Get-ChildItem C:\\ -Recurse -File -ErrorAction SilentlyContinue | '
+                     'ForEach-Object { $_.Length } > data\\result.txt')
     run.font.name = "Courier New"
     run.font.size = Pt(11)
 
@@ -179,7 +180,7 @@ def generate_report(data_path="./data/result.txt", plots_dir="./plots", output_p
     doc.add_heading("5. Висновки", level=1)
 
     doc.add_paragraph(
-        f"За результатами аналізу {stats['count']:,} файлів файлової системи macOS "
+        f"За результатами аналізу {stats['count']:,} файлів файлової системи Windows "
         f"було встановлено наступне:"
     )
 
@@ -212,9 +213,9 @@ def generate_report(data_path="./data/result.txt", plots_dir="./plots", output_p
     doc.add_heading("6. Як запустити", level=1)
     commands = [
         ("Встановлення залежностей:", "uv sync"),
-        ("Збір даних:", "make collect"),
-        ("Аналіз та візуалізація:", "make analyze"),
-        ("Генерація цього звіту:", "uv run --with python-docx python generate_report.py"),
+        ("Збір даних:", "cd lab1-file-size-analysis && uv run python dtr.py collect C:\\"),
+        ("Аналіз та візуалізація:", "cd lab1-file-size-analysis && uv run python dtr.py analyze"),
+        ("Генерація цього звіту:", "cd lab1-file-size-analysis && uv run --with python-docx python generate_report.py"),
     ]
     for desc, cmd in commands:
         doc.add_paragraph(desc)
